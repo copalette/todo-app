@@ -9,20 +9,3 @@ const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY as string;
 
 // Supabaseクライアントの初期化
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
-
-// 接続テスト用関数
-export const testConnection = async () => {
-  try {
-    const { data, error } = await supabase.from('todos').select('count').limit(1);
-    if (error) {
-      console.error('Supabase接続テストエラー:', error);
-      return false;
-    } else {
-      console.log('Supabase接続テスト成功');
-      return true;
-    }
-  } catch (err) {
-    console.error('Supabase接続テスト例外:', err);
-    return false;
-  }
-}; 
