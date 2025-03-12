@@ -38,15 +38,21 @@ function RegisterPage() {
   };
 
   return (
-    <div className="auth-page">
-      <div className="auth-container">
-        <h1 className="auth-title">新規登録</h1>
+    <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="w-full max-w-md p-8 bg-white rounded-lg shadow-md">
+        <h1 className="text-2xl font-bold text-primary text-center mb-6">新規登録</h1>
         
-        {error && <div className="auth-error">{error}</div>}
+        {error && (
+          <div className="bg-red-100 text-red-600 p-3 rounded-lg mb-4 text-center">
+            {error}
+          </div>
+        )}
         
-        <form onSubmit={handleSubmit} className="auth-form">
-          <div className="form-group">
-            <label htmlFor="email">メールアドレス</label>
+        <form onSubmit={handleSubmit} className="mb-6">
+          <div className="mb-4">
+            <label htmlFor="email" className="block text-gray-700 font-medium mb-1">
+              メールアドレス
+            </label>
             <input
               type="email"
               id="email"
@@ -54,11 +60,14 @@ function RegisterPage() {
               onChange={(e) => setEmail(e.target.value)}
               disabled={isLoading}
               required
+              className="bg-white w-full px-3 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
             />
           </div>
           
-          <div className="form-group">
-            <label htmlFor="password">パスワード</label>
+          <div className="mb-4">
+            <label htmlFor="password" className="block text-gray-700 font-medium mb-1">
+              パスワード
+            </label>
             <input
               type="password"
               id="password"
@@ -66,11 +75,14 @@ function RegisterPage() {
               onChange={(e) => setPassword(e.target.value)}
               disabled={isLoading}
               required
+              className="bg-white w-full px-3 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
             />
           </div>
           
-          <div className="form-group">
-            <label htmlFor="confirmPassword">パスワード（確認）</label>
+          <div className="mb-6">
+            <label htmlFor="confirmPassword" className="block text-gray-700 font-medium mb-1">
+              パスワード（確認）
+            </label>
             <input
               type="password"
               id="confirmPassword"
@@ -78,25 +90,30 @@ function RegisterPage() {
               onChange={(e) => setConfirmPassword(e.target.value)}
               disabled={isLoading}
               required
+              className="bg-white w-full px-3 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
             />
           </div>
           
           <button 
             type="submit" 
             disabled={isLoading}
-            className="auth-button"
+            className="w-full bg-primary hover:bg-primary-dark text-white font-medium py-2 px-4 rounded-md transition duration-200 ease-in-out"
           >
             {isLoading ? '登録中...' : '登録する'}
           </button>
         </form>
         
-        <div className="auth-links">
-          <p>
+        <div className="text-center text-gray-600">
+          <p className="mb-2">
             すでにアカウントをお持ちの方は
-            <Link to="/login" className="auth-link">ログイン</Link>
+            <Link to="/login" className="text-primary font-medium ml-1 hover:underline">
+              ログイン
+            </Link>
           </p>
           <p>
-            <Link to="/" className="auth-link">ホームに戻る</Link>
+            <Link to="/" className="text-primary font-medium hover:underline">
+              ホームに戻る
+            </Link>
           </p>
         </div>
       </div>

@@ -39,28 +39,31 @@ export function TodoItem({ todo, onDelete, onToggleComplete }: TodoItemProps) {
   };
 
   return (
-    <div className="todo-item">
-      <div className="todo-item-content">
+    <div className="bg-white p-5 rounded-lg shadow-md flex justify-between items-center hover:shadow-lg transition-shadow duration-200">
+      <div className="flex items-start gap-4 flex-1">
         <input
           type="checkbox"
           checked={todo.is_completed}
           onChange={handleToggleComplete}
           disabled={isLoading}
-          className="todo-checkbox"
+          className="mt-1 w-5 h-5 cursor-pointer"
         />
-        <div className={`todo-text ${todo.is_completed ? 'completed' : ''}`}>
-          <h3>{todo.title}</h3>
-          <p>{todo.description}</p>
+        <div className={`${todo.is_completed ? 'text-gray-400 line-through' : 'text-gray-800'}`}>
+          <h3 className="text-lg font-medium mb-1">{todo.title}</h3>
+          <p className="text-sm text-gray-600">{todo.description}</p>
         </div>
       </div>
-      <div className="todo-actions">
-        <Link to={`/todo/${todo.id}/edit`} className="edit-button">
+      <div className="flex gap-2">
+        <Link 
+          to={`/todo/${todo.id}/edit`} 
+          className="bg-gray-200 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-300 transition-colors duration-200"
+        >
           編集
         </Link>
         <button 
           onClick={handleDelete} 
           disabled={isLoading}
-          className="delete-button"
+          className="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600 transition-colors duration-200 disabled:bg-gray-400"
         >
           削除
         </button>

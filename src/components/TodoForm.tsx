@@ -50,13 +50,19 @@ export function TodoForm({ onTodoAdded }: TodoFormProps) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="todo-form">
-      <h2>新しいTodoを追加</h2>
+    <form onSubmit={handleSubmit} className="bg-white p-6 rounded-lg shadow-md mb-6">
+      <h2 className="text-xl font-bold text-primary mb-4">新しいTodoを追加</h2>
       
-      {error && <div className="error">{error}</div>}
+      {error && (
+        <div className="bg-red-100 text-red-600 p-3 rounded-lg mb-4">
+          {error}
+        </div>
+      )}
       
-      <div className="form-group">
-        <label htmlFor="title">タイトル</label>
+      <div className="mb-4">
+        <label htmlFor="title" className="block text-gray-700 font-medium mb-1">
+          タイトル
+        </label>
         <input
           type="text"
           id="title"
@@ -65,11 +71,14 @@ export function TodoForm({ onTodoAdded }: TodoFormProps) {
           disabled={isLoading}
           placeholder="Todoのタイトルを入力"
           required
+          className="bg-white w-full px-3 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
         />
       </div>
       
-      <div className="form-group">
-        <label htmlFor="description">説明</label>
+      <div className="mb-6">
+        <label htmlFor="description" className="block text-gray-700 font-medium mb-1">
+          説明
+        </label>
         <textarea
           id="description"
           value={description}
@@ -77,13 +86,14 @@ export function TodoForm({ onTodoAdded }: TodoFormProps) {
           disabled={isLoading}
           placeholder="Todoの詳細を入力（任意）"
           rows={3}
+          className="bg-white w-full px-3 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
         />
       </div>
       
       <button 
         type="submit" 
         disabled={isLoading}
-        className="submit-button"
+        className="w-full bg-primary hover:bg-primary-dark text-white font-medium py-2 px-4 rounded-md transition duration-200 ease-in-out"
       >
         {isLoading ? '追加中...' : '追加する'}
       </button>

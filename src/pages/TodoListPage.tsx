@@ -45,7 +45,11 @@ function TodoListPage() {
   };
 
   if (isLoading) {
-    return <div className="loading-container">読み込み中...</div>;
+    return <div className="flex justify-center items-center min-h-screen bg-gray-50 p-4">
+      <div className="p-8 text-center text-gray-600 bg-white rounded-lg shadow-md">
+        読み込み中...
+      </div>
+    </div>;
   }
 
   if (!isAuthenticated) {
@@ -53,17 +57,20 @@ function TodoListPage() {
   }
 
   return (
-    <div className="todo-page">
-      <header className="todo-header">
-        <h1>Todoリスト</h1>
-        <div className="header-actions">
-          <button onClick={handleLogout} className="logout-button">
+    <div className="max-w-4xl mx-auto p-4 bg-gray-50 min-h-screen">
+      <header className="flex justify-between items-center mb-8 pb-4 border-b border-gray-200">
+        <h1 className="text-2xl font-bold text-primary">Todoリスト</h1>
+        <div>
+          <button 
+            onClick={handleLogout} 
+            className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-100 transition-colors duration-200"
+          >
             ログアウト
           </button>
         </div>
       </header>
 
-      <main className="todo-content">
+      <main className="flex flex-col gap-6">
         <TodoForm onTodoAdded={handleTodoAdded} />
         <TodoList />
       </main>

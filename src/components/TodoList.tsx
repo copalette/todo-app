@@ -43,19 +43,19 @@ export function TodoList() {
   };
 
   if (isLoading) {
-    return <div className="loading">読み込み中...</div>;
+    return <div className="p-8 text-center text-gray-600 bg-white rounded-lg shadow-md">読み込み中...</div>;
   }
 
   if (error) {
-    return <div className="error">{error}</div>;
+    return <div className="p-8 text-center text-red-600 bg-red-50 rounded-lg shadow-md">{error}</div>;
   }
 
   if (todos.length === 0) {
-    return <div className="empty-state">Todoがありません。新しいTodoを追加してください。</div>;
+    return <div className="p-8 text-center text-gray-600 bg-white rounded-lg shadow-md">Todoがありません。新しいTodoを追加してください。</div>;
   }
 
   return (
-    <div className="todo-list">
+    <div className="flex flex-col gap-4">
       {todos.map(todo => (
         <TodoItem 
           key={todo.id} 

@@ -8,26 +8,7 @@ console.log('SUPABASE_ANON_KEY設定済み:', !!import.meta.env.VITE_SUPABASE_AN
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL as string;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY as string;
 
-// URLとキーが有効か確認
-if (!supabaseUrl || !supabaseAnonKey) {
-  console.error('Supabase環境変数が設定されていません');
-}
-
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
-
-// 接続テスト
-(async () => {
-  try {
-    const { data, error } = await supabase.from('todos').select('count').limit(1);
-    if (error) {
-      console.error('Supabase接続テストエラー:', error);
-    } else {
-      console.log('Supabase接続テスト成功:', data);
-    }
-  } catch (err) {
-    console.error('Supabase接続テスト例外:', err);
-  }
-})();
 
 // Todoテーブルの操作関数
 export const todoService = {
