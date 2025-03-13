@@ -16,6 +16,8 @@ function TodoListPage() {
     }
   }, [user, isLoading, navigate]);
 
+  const [showAddForm, setShowAddForm] = useState(false);
+
   const handleTodoAdded = (newTodo: Todo) => {
     // TodoListコンポーネントは自動的に更新されるため、
     // ここでは特に何もする必要はありません
@@ -60,8 +62,24 @@ function TodoListPage() {
       </header>
 
       <main className="flex flex-col gap-6">
-        <TodoForm onTodoAdded={handleTodoAdded} />
         <TodoList />
+        
+        {showAddForm ? (
+          <TodoForm 
+            onTodoAdded={(todo) => {
+              handleTodoAdded(todo);
+              setShowAddForm(false);
+            }}
+            onCancel={() => setShowAddForm(false)}
+          />
+        ) : (
+          <button
+            onClick={() => setShowAddForm(true)}
+            className="bg-primary text-white font-medium py-2 px-4 rounded-md hover:bg-primary-dark transition duration-200 ease-in-out"
+          >
+            + 新しいTodoを追加
+          </button>
+        )}
       </main>
     </div>
   );

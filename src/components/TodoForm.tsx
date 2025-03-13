@@ -5,9 +5,10 @@ import { Todo } from '../types';
 
 interface TodoFormProps {
   onTodoAdded: (todo: Todo) => void;
+  onCancel: () => void;
 }
 
-export function TodoForm({ onTodoAdded }: TodoFormProps) {
+export function TodoForm({ onTodoAdded, onCancel }: TodoFormProps) {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -45,6 +46,12 @@ export function TodoForm({ onTodoAdded }: TodoFormProps) {
     }
   };
 
+  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter' && title.trim()) {
+      handleSubmit(e);
+    }
+  };
+
   return (
     <form onSubmit={handleSubmit} className="bg-white p-6 rounded-lg shadow-md mb-6">
       <h2 className="text-xl font-bold text-primary mb-4">新しいTodoを追加</h2>
@@ -67,6 +74,7 @@ export function TodoForm({ onTodoAdded }: TodoFormProps) {
           disabled={isLoading}
           placeholder="Todoのタイトルを入力"
           required
+          onKeyPress={handleKeyPress}
           className="bg-white w-full px-3 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
         />
       </div>
@@ -81,18 +89,29 @@ export function TodoForm({ onTodoAdded }: TodoFormProps) {
           onChange={(e) => setDescription(e.target.value)}
           disabled={isLoading}
           placeholder="Todoの詳細を入力（任意）"
-          rows={3}
+          rows={2}
           className="bg-white w-full px-3 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
         />
       </div>
       
-      <button 
-        type="submit" 
-        disabled={isLoading}
-        className="w-full bg-primary hover:bg-primary-dark text-white font-medium py-2 px-4 rounded-md transition duration-200 ease-in-out"
-      >
-        {isLoading ? '追加中...' : '追加する'}
-      </button>
+      <div className="flex gap-2">
+        <button 
+          type="submit" 
+          disabled={isLoading}
+          className="flex-1 bg-primary hover:bg-primary-dark text-white font-medium py-2 px-4 rounded-md transition duration-200 ease-in-out"
+        >
+          {isLoading ? '追加中...' : '追加する'}
+        </button>
+        
+        <button 
+          type="button"
+          onClick={onCancel}
+          disabled={isLoading}
+          className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-100 transition-colors duration-200"
+        >
+          キャンセル
+        </button>
+      </div>
     </form>
   );
 } 
