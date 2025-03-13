@@ -165,15 +165,53 @@ export const useTodos = (userId: string | undefined) => {
     const subscription = supabase
       .channel('todos-changes')
       .on('postgres_changes', 
-        { 
-          event: '*', 
-          schema: 'public', 
-          table: 'todos',
-          filter: `user_id=eq.${userId}`
-        }, 
-        () => {
-          // 変更があった場合にデータを再取得
-          fetchTodos();
+        { event: 'INSERT', schema: 'public', table: 'todos', filter: `user_id=eq.${userId}` }, 
+        (payload) => {
+          // 新しいTodoが追加された場合
+          const newTodo = payload.new as Todo;
+          setTodos(prevTodos => [newTodo, ...prevTodos]);
+          
+          // 統計情報を更新
+          setStats(prev => ({
+            total: prev.total + 1,
+            completed: prev.completed,
+            remaining: prev.remaining + 1
+          }));
+        }
+      )
+      .on('postgres_changes', 
+        { event: 'UPDATE', schema: 'public', table: 'todos', filter: `user_id=eq.${userId}` }, 
+        (payload) => {
+          // Todoが更新された場合
+          const updatedTodo = payload.new as Todo;
+          setTodos(prevTodos => 
+            prevTodos.map(todo => todo.id === updatedTodo.id ? updatedTodo : todo)
+          );
+          
+          // 完了状態が変更された場合、統計情報を更新
+          const oldTodo = payload.old as Todo;
+          if (oldTodo.is_completed !== updatedTodo.is_completed) {
+            setStats(prev => ({
+              total: prev.total,
+              completed: prev.completed + (updatedTodo.is_completed ? 1 : -1),
+              remaining: prev.remaining + (updatedTodo.is_completed ? -1 : 1)
+            }));
+          }
+        }
+      )
+      .on('postgres_changes', 
+        { event: 'DELETE', schema: 'public', table: 'todos', filter: `user_id=eq.${userId}` }, 
+        (payload) => {
+          // Todoが削除された場合
+          const deletedTodo = payload.old as Todo;
+          setTodos(prevTodos => prevTodos.filter(todo => todo.id !== deletedTodo.id));
+          
+          // 統計情報を更新
+          setStats(prev => ({
+            total: prev.total - 1,
+            completed: prev.completed - (deletedTodo.is_completed ? 1 : 0),
+            remaining: prev.remaining - (deletedTodo.is_completed ? 0 : 1)
+          }));
         }
       )
       .subscribe();
