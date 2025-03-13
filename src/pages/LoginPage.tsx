@@ -1,13 +1,20 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { authService } from '../lib/supabase';
+import { useAuth } from '../hooks/useAuth';
 
 function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
+  const { signIn, user, loading, error: authError } = useAuth();
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
+
+  // ユーザーが既にログインしている場合はTodoページにリダイレクト
+  useEffect(() => {
+    if (user && !loading) {
+      navigate('/todo');
+    }
+  }, [user, loading, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -18,32 +25,46 @@ function LoginPage() {
     }
 
     try {
-      setIsLoading(true);
       setError(null);
       
-      await authService.signIn(email, password);
-      navigate('/todo'); // ログイン成功後、TodoListPageに遷移
+      const result = await signIn(email, password);
+      if (result) {
+        navigate('/todo'); // ログイン成功後、TodoListPageに遷移
+      }
     } catch (err) {
       console.error('ログインに失敗しました:', err);
-      setError('ログインに失敗しました。メールアドレスとパスワードを確認してください。');
-    } finally {
-      setIsLoading(false);
+      setError(err instanceof Error ? err.message : 'ログインに失敗しました。メールアドレスとパスワードを確認してください。');
     }
   };
 
+  // authErrorがある場合はそれを表示
+  useEffect(() => {
+    if (authError) {
+      setError(authError);
+    }
+  }, [authError]);
+
+  if (loading) {
+    return <div className="flex justify-center items-center min-h-screen bg-gray-50 p-4">
+      <div className="p-8 text-center text-gray-600 bg-white rounded-lg shadow-md">
+        読み込み中...
+      </div>
+    </div>;
+  }
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
-      <div className="w-full max-w-md p-8 bg-white rounded-lg shadow-md">
-        <h1 className="text-2xl font-bold text-primary text-center mb-6">ログイン</h1>
+      <div className="max-w-md w-full p-8 bg-white rounded-lg shadow-md">
+        <h1 className="text-2xl font-bold text-primary mb-6 text-center">ログイン</h1>
         
         {error && (
-          <div className="bg-red-100 text-red-600 p-3 rounded-lg mb-4 text-center">
+          <div className="bg-red-100 text-red-600 p-3 rounded-lg mb-4">
             {error}
           </div>
         )}
         
-        <form onSubmit={handleSubmit} className="mb-6">
-          <div className="mb-4">
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
             <label htmlFor="email" className="block text-gray-700 font-medium mb-1">
               メールアドレス
             </label>
@@ -52,13 +73,12 @@ function LoginPage() {
               id="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              disabled={isLoading}
-              required
               className="bg-white w-full px-3 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+              required
             />
           </div>
           
-          <div className="mb-6">
+          <div>
             <label htmlFor="password" className="block text-gray-700 font-medium mb-1">
               パスワード
             </label>
@@ -67,31 +87,24 @@ function LoginPage() {
               id="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              disabled={isLoading}
-              required
               className="bg-white w-full px-3 py-2 border border-gray-300 rounded-md text-gray-700 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+              required
             />
           </div>
           
           <button 
             type="submit" 
-            disabled={isLoading}
             className="w-full bg-primary hover:bg-primary-dark text-white font-medium py-2 px-4 rounded-md transition duration-200 ease-in-out"
           >
-            {isLoading ? 'ログイン中...' : 'ログイン'}
+            ログイン
           </button>
         </form>
         
-        <div className="text-center text-gray-600">
-          <p className="mb-2">
+        <div className="mt-6 text-center">
+          <p className="text-gray-600">
             アカウントをお持ちでない方は
-            <Link to="/register" className="text-primary font-medium ml-1 hover:underline">
+            <Link to="/register" className="text-primary hover:underline ml-1">
               新規登録
-            </Link>
-          </p>
-          <p>
-            <Link to="/" className="text-primary font-medium hover:underline">
-              ホームに戻る
             </Link>
           </p>
         </div>

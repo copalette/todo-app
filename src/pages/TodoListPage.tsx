@@ -3,41 +3,27 @@ import { Link, useNavigate } from 'react-router-dom';
 import { TodoList } from '../components/TodoList';
 import { TodoForm } from '../components/TodoForm';
 import { Todo } from '../types';
-import { authService } from '../lib/supabase';
+import { useAuth } from '../hooks/useAuth';
 
 function TodoListPage() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
-  const [todos, setTodos] = useState<Todo[]>([]);
+  const { user, loading: isLoading, signOut } = useAuth();
   const navigate = useNavigate();
 
+  // 認証状態が変わったときにリダイレクト
   useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        const user = await authService.getCurrentUser();
-        if (!user) {
-          navigate('/login');
-          return;
-        }
-        setIsAuthenticated(true);
-      } catch (error) {
-        console.error('認証チェックに失敗しました:', error);
-        navigate('/login');
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    checkAuth();
-  }, [navigate]);
+    if (!isLoading && !user) {
+      navigate('/login');
+    }
+  }, [user, isLoading, navigate]);
 
   const handleTodoAdded = (newTodo: Todo) => {
-    setTodos([newTodo, ...todos]);
+    // TodoListコンポーネントは自動的に更新されるため、
+    // ここでは特に何もする必要はありません
   };
 
   const handleLogout = async () => {
     try {
-      await authService.signOut();
+      await signOut();
       navigate('/login');
     } catch (error) {
       console.error('ログアウトに失敗しました:', error);
@@ -52,7 +38,7 @@ function TodoListPage() {
     </div>;
   }
 
-  if (!isAuthenticated) {
+  if (!user) {
     return null; // ログインページにリダイレクト中
   }
 
@@ -60,7 +46,10 @@ function TodoListPage() {
     <div className="max-w-4xl mx-auto p-4 bg-gray-50 min-h-screen">
       <header className="flex justify-between items-center mb-8 pb-4 border-b border-gray-200">
         <h1 className="text-2xl font-bold text-primary">Todoリスト</h1>
-        <div>
+        <div className="flex items-center gap-4">
+          <span className="text-gray-600">
+            {user.email}
+          </span>
           <button 
             onClick={handleLogout} 
             className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-100 transition-colors duration-200"
