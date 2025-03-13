@@ -1,45 +1,26 @@
 import { useState, useEffect } from 'react';
 import { Todo } from '../types';
 import { TodoItem } from './TodoItem';
-import { todoService, authService } from '../lib/supabase';
+import { useTodos } from '../hooks/useTodos';
+import { useAuth } from '../hooks/useAuth';
 
 export function TodoList() {
-  const [todos, setTodos] = useState<Todo[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const { user } = useAuth();
+  const { 
+    todos, 
+    loading: isLoading, 
+    error, 
+    stats,
+    deleteTodo,
+    toggleTodoCompletion
+  } = useTodos(user?.id);
 
-  useEffect(() => {
-    const fetchTodos = async () => {
-      try {
-        setIsLoading(true);
-        const user = await authService.getCurrentUser();
-        
-        if (!user) {
-          setError('ログインが必要です');
-          return;
-        }
-        
-        const todoData = await todoService.getAllTodos(user.id);
-        setTodos(todoData);
-      } catch (err) {
-        console.error('Todoの取得に失敗しました:', err);
-        setError('Todoの取得に失敗しました');
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchTodos();
-  }, []);
-
-  const handleDelete = (id: string) => {
-    setTodos(todos.filter(todo => todo.id !== id));
+  const handleDelete = async (id: string) => {
+    await deleteTodo(id);
   };
 
-  const handleToggleComplete = (id: string, isCompleted: boolean) => {
-    setTodos(todos.map(todo => 
-      todo.id === id ? { ...todo, is_completed: isCompleted } : todo
-    ));
+  const handleToggleComplete = async (id: string, isCompleted: boolean) => {
+    await toggleTodoCompletion(id);
   };
 
   if (isLoading) {
@@ -55,15 +36,35 @@ export function TodoList() {
   }
 
   return (
-    <div className="flex flex-col gap-4">
-      {todos.map(todo => (
-        <TodoItem 
-          key={todo.id} 
-          todo={todo} 
-          onDelete={handleDelete}
-          onToggleComplete={handleToggleComplete}
-        />
-      ))}
+    <div>
+      <div className="mb-4 p-4 bg-white rounded-lg shadow-md">
+        <h3 className="text-lg font-medium mb-2">統計情報</h3>
+        <div className="flex gap-4">
+          <div className="bg-gray-100 p-2 rounded-md">
+            <span className="text-gray-600">合計: </span>
+            <span className="font-bold">{stats.total}</span>
+          </div>
+          <div className="bg-green-100 p-2 rounded-md">
+            <span className="text-gray-600">完了: </span>
+            <span className="font-bold">{stats.completed}</span>
+          </div>
+          <div className="bg-yellow-100 p-2 rounded-md">
+            <span className="text-gray-600">未完了: </span>
+            <span className="font-bold">{stats.remaining}</span>
+          </div>
+        </div>
+      </div>
+
+      <div className="flex flex-col gap-4">
+        {todos.map(todo => (
+          <TodoItem 
+            key={todo.id} 
+            todo={todo} 
+            onDelete={handleDelete}
+            onToggleComplete={handleToggleComplete}
+          />
+        ))}
+      </div>
     </div>
   );
 } 

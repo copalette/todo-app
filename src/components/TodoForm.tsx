@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { todoService, authService } from '../lib/supabase';
+import { todoService } from '../services/todoService';
+import { authService } from '../services/authService';
 import { Todo } from '../types';
 
 interface TodoFormProps {
@@ -31,19 +32,14 @@ export function TodoForm({ onTodoAdded }: TodoFormProps) {
         return;
       }
       
-      const newTodo = await todoService.createTodo({
-        title,
-        description,
-        user_id: user.id,
-        is_completed: false
-      });
+      const newTodo = await todoService.createTodo(user.id, title, description);
       
       onTodoAdded(newTodo);
       setTitle('');
       setDescription('');
     } catch (err) {
       console.error('Todoの作成に失敗しました:', err);
-      setError('Todoの作成に失敗しました');
+      setError(err instanceof Error ? err.message : 'Todoの作成に失敗しました');
     } finally {
       setIsLoading(false);
     }
