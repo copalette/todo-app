@@ -19,7 +19,7 @@ export function TodoList() {
     await deleteTodo(id);
   };
 
-  const handleToggleComplete = async (id: string, isCompleted: boolean) => {
+  const handleToggleComplete = async (id: string) => {
     await toggleTodoCompletion(id);
   };
 

@@ -101,25 +101,49 @@ export const useTodos = (userId: string | undefined) => {
   // Todoの完了状態を切り替え
   const toggleTodoCompletion = async (id: string) => {
     setError(null);
+    
+    // 現在のTodoの状態を取得
+    const currentTodo = todos.find(todo => todo.id === id);
+    if (!currentTodo) {
+      setError('対象のTodoが見つかりません');
+      return null;
+    }
+    
+    // 新しい完了状態
+    const newIsCompleted = !currentTodo.is_completed;
+    
+    // 楽観的UI更新のために現在の状態をバックアップ
+    const originalTodos = [...todos];
+    const originalStats = { ...stats };
+    
     try {
-      const updatedTodo = await todoService.toggleTodoCompletion(id);
+      // 楽観的UI更新
       setTodos(prevTodos => 
-        prevTodos.map(todo => todo.id === id ? updatedTodo : todo)
+        prevTodos.map(todo => 
+          todo.id === id 
+            ? { ...todo, is_completed: newIsCompleted }
+            : todo
+        )
       );
       
       // 統計情報を更新
-      setStats(prev => {
-        const isNowCompleted = updatedTodo.is_completed;
-        return {
-          total: prev.total,
-          completed: prev.completed + (isNowCompleted ? 1 : -1),
-          remaining: prev.remaining + (isNowCompleted ? -1 : 1)
-        };
-      });
+      setStats(prev => ({
+        total: prev.total,
+        completed: prev.completed + (newIsCompleted ? 1 : -1),
+        remaining: prev.remaining + (newIsCompleted ? -1 : 1)
+      }));
+
+      // サーバーでの更新
+      await todoService.toggleTodoCompletion(id);
       
-      return updatedTodo;
+      return currentTodo;
     } catch (err) {
       console.error('Todoの状態変更に失敗しました:', err);
+      
+      // エラーが発生した場合は元の状態に戻す
+      setTodos(originalTodos);
+      setStats(originalStats);
+      
       setError(err instanceof Error ? err.message : '不明なエラーが発生しました');
       return null;
     }

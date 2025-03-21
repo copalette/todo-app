@@ -6,7 +6,7 @@ import { todoService } from '../services/todoService';
 interface TodoItemProps {
   todo: Todo;
   onDelete: (id: string) => void;
-  onToggleComplete: (id: string, isCompleted: boolean) => void;
+  onToggleComplete: (id: string) => void;
 }
 
 export function TodoItem({ todo, onDelete, onToggleComplete }: TodoItemProps) {
@@ -15,8 +15,7 @@ export function TodoItem({ todo, onDelete, onToggleComplete }: TodoItemProps) {
   const handleToggleComplete = async () => {
     try {
       setIsLoading(true);
-      await todoService.updateTodo(todo.id, { is_completed: !todo.is_completed });
-      onToggleComplete(todo.id, !todo.is_completed);
+      onToggleComplete(todo.id);
     } catch (error) {
       console.error('Todoの完了状態の更新に失敗しました:', error);
     } finally {
@@ -39,18 +38,34 @@ export function TodoItem({ todo, onDelete, onToggleComplete }: TodoItemProps) {
   };
 
   return (
-    <div className="bg-white p-5 rounded-lg shadow-md flex justify-between items-center hover:shadow-lg transition-shadow duration-200">
+    <div className={`bg-white p-5 rounded-lg shadow-md flex justify-between items-center hover:shadow-lg transition-all duration-200 ${
+      todo.is_completed ? 'bg-gray-50' : ''
+    }`}>
       <div className="flex items-start gap-4 flex-1">
-        <input
-          type="checkbox"
-          checked={todo.is_completed}
-          onChange={handleToggleComplete}
-          disabled={isLoading}
-          className="mt-1 w-5 h-5 cursor-pointer"
-        />
-        <div className={`${todo.is_completed ? 'text-gray-400 line-through' : 'text-gray-800'}`}>
+        <div className="relative">
+          <input
+            type="checkbox"
+            checked={todo.is_completed}
+            onChange={handleToggleComplete}
+            disabled={isLoading}
+            className="w-5 h-5 cursor-pointer border-2 border-gray-300 rounded-md checked:bg-green-500 checked:border-green-500 transition-colors duration-200"
+          />
+          {todo.is_completed && (
+            <div className="absolute top-0 left-0 w-full h-0.5 bg-gray-400 transform rotate-45 origin-left"></div>
+          )}
+        </div>
+        <div className={`flex-1 transition-all duration-200 ${
+          todo.is_completed 
+            ? 'text-gray-400 line-through' 
+            : 'text-gray-800'
+        }`}>
           <h3 className="text-lg font-medium mb-1">{todo.title}</h3>
           <p className="text-sm text-gray-600">{todo.description}</p>
+          {todo.is_completed && (
+            <span className="inline-block mt-2 text-xs text-green-600 bg-green-50 px-2 py-1 rounded">
+              完了済み
+            </span>
+          )}
         </div>
       </div>
       <div className="flex gap-2">
