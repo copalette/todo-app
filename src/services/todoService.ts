@@ -64,13 +64,22 @@ export const todoService = {
 
   // Todoを削除
   async deleteTodo(id: string): Promise<void> {
-    // 削除前にTodoの存在確認
-    const existingTodo = await todoRepository.getTodoById(id);
-    if (!existingTodo) {
-      throw new Error('削除対象のTodoが見つかりません');
-    }
+    try {
+      // 削除前にTodoの存在確認
+      const existingTodo = await todoRepository.getTodoById(id);
+      // 既に削除されている場合は成功として扱う
+      if (!existingTodo) {
+        return;
+      }
 
-    return todoRepository.deleteTodo(id);
+      await todoRepository.deleteTodo(id);
+    } catch (err) {
+      // PGRST116エラー（行が見つからない）は無視
+      if (err && typeof err === 'object' && 'code' in err && err.code === 'PGRST116') {
+        return;
+      }
+      throw err;
+    }
   },
 
   // ユーザーのTodo統計情報を取得

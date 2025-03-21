@@ -129,28 +129,31 @@ export const useTodos = (userId: string | undefined) => {
   const deleteTodo = async (id: string) => {
     setError(null);
     try {
-      await todoService.deleteTodo(id);
-      
-      // 削除前のTodoの状態を取得
-      const deletedTodo = todos.find(todo => todo.id === id);
-      
-      // Todoリストから削除
-      setTodos(prevTodos => prevTodos.filter(todo => todo.id !== id));
-      
-      // 統計情報を更新
-      if (deletedTodo) {
-        setStats(prev => ({
-          total: prev.total - 1,
-          completed: prev.completed - (deletedTodo.is_completed ? 1 : 0),
-          remaining: prev.remaining - (deletedTodo.is_completed ? 0 : 1)
-        }));
+      // 削除対象のTodoを取得
+      const todoToDelete = todos.find(todo => todo.id === id);
+      if (!todoToDelete) {
+        throw new Error('削除対象のTodoが見つかりません');
       }
-      
-      return true;
+
+      // 実際の削除処理を先に実行
+      await todoService.deleteTodo(id);
+
+      // 削除成功後にUIを更新
+      setTodos(prevTodos => {
+        const newTodos = prevTodos.filter(todo => todo.id !== id);
+        const total = newTodos.length;
+        const completed = newTodos.filter(todo => todo.is_completed).length;
+        setStats({
+          total,
+          completed,
+          remaining: total - completed
+        });
+        return newTodos;
+      });
     } catch (err) {
       console.error('Todoの削除に失敗しました:', err);
-      setError(err instanceof Error ? err.message : '不明なエラーが発生しました');
-      return false;
+      const errorMessage = err instanceof Error ? err.message : 'Todoの削除に失敗しました';
+      setError(errorMessage);
     }
   };
 
