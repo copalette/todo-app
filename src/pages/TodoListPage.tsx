@@ -4,10 +4,20 @@ import { TodoList } from '../components/TodoList';
 import { TodoForm } from '../components/TodoForm';
 import { Todo } from '../types';
 import { useAuth } from '../hooks/useAuth';
+import { useTodos } from '../hooks/useTodos';
 
 function TodoListPage() {
   const { user, loading: isLoading, signOut } = useAuth();
   const navigate = useNavigate();
+  const { 
+    todos,
+    loading: todosLoading,
+    error: todosError,
+    stats,
+    createTodo,
+    deleteTodo,
+    toggleTodoCompletion
+  } = useTodos(user?.id);
 
   // 認証状態が変わったときにリダイレクト
   useEffect(() => {
@@ -18,9 +28,19 @@ function TodoListPage() {
 
   const [showAddForm, setShowAddForm] = useState(false);
 
-  const handleTodoAdded = (newTodo: Todo) => {
-    // TodoListコンポーネントは自動的に更新されるため、
-    // ここでは特に何もする必要はありません
+  const handleTodoAdded = async (title: string, description: string) => {
+    const newTodo = await createTodo(title, description);
+    if (newTodo) {
+      setShowAddForm(false);
+    }
+  };
+
+  const handleDelete = async (id: string) => {
+    await deleteTodo(id);
+  };
+
+  const handleToggleComplete = async (id: string) => {
+    await toggleTodoCompletion(id);
   };
 
   const handleLogout = async () => {
@@ -62,14 +82,18 @@ function TodoListPage() {
       </header>
 
       <main className="flex flex-col gap-6">
-        <TodoList />
+        <TodoList 
+          todos={todos}
+          loading={todosLoading}
+          error={todosError}
+          stats={stats}
+          onDelete={handleDelete}
+          onToggleComplete={handleToggleComplete}
+        />
         
         {showAddForm ? (
           <TodoForm 
-            onTodoAdded={(todo) => {
-              handleTodoAdded(todo);
-              setShowAddForm(false);
-            }}
+            onTodoAdded={handleTodoAdded}
             onCancel={() => setShowAddForm(false)}
           />
         ) : (

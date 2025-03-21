@@ -1,29 +1,28 @@
-import { useState, useEffect } from 'react';
 import { Todo } from '../types';
 import { TodoItem } from './TodoItem';
-import { useTodos } from '../hooks/useTodos';
-import { useAuth } from '../hooks/useAuth';
 
-export function TodoList() {
-  const { user } = useAuth();
-  const { 
-    todos, 
-    loading: isLoading, 
-    error, 
-    stats,
-    deleteTodo,
-    toggleTodoCompletion
-  } = useTodos(user?.id);
-
-  const handleDelete = async (id: string) => {
-    await deleteTodo(id);
+interface TodoListProps {
+  todos: Todo[];
+  loading: boolean;
+  error: string | null;
+  stats: {
+    total: number;
+    completed: number;
+    remaining: number;
   };
+  onDelete: (id: string) => Promise<void>;
+  onToggleComplete: (id: string) => Promise<void>;
+}
 
-  const handleToggleComplete = async (id: string) => {
-    await toggleTodoCompletion(id);
-  };
-
-  if (isLoading) {
+export function TodoList({ 
+  todos, 
+  loading, 
+  error, 
+  stats,
+  onDelete,
+  onToggleComplete 
+}: TodoListProps) {
+  if (loading) {
     return <div className="p-8 text-center text-gray-600 bg-white rounded-lg shadow-md">読み込み中...</div>;
   }
 
@@ -38,7 +37,7 @@ export function TodoList() {
   return (
     <div>
       <div className="mb-4 p-4 bg-white rounded-lg shadow-md">
-          <div className="flex gap-4">
+        <div className="flex gap-4">
           <div className="bg-gray-100 p-2 rounded-md">
             <span className="text-gray-600">合計: </span>
             <span className="font-bold">{stats.total}</span>
@@ -59,8 +58,8 @@ export function TodoList() {
           <TodoItem 
             key={todo.id} 
             todo={todo} 
-            onDelete={handleDelete}
-            onToggleComplete={handleToggleComplete}
+            onDelete={onDelete}
+            onToggleComplete={onToggleComplete}
           />
         ))}
       </div>

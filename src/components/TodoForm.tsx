@@ -4,7 +4,7 @@ import { authService } from '../services/authService';
 import { Todo } from '../types';
 
 interface TodoFormProps {
-  onTodoAdded: (todo: Todo) => void;
+  onTodoAdded: (title: string, description: string) => Promise<void>;
   onCancel: () => void;
 }
 
@@ -23,6 +23,7 @@ export function TodoForm({ onTodoAdded, onCancel }: TodoFormProps) {
     }
 
     try {
+      console.log('Todo作成開始:', { title, description });
       setIsLoading(true);
       setError(null);
       
@@ -33,9 +34,7 @@ export function TodoForm({ onTodoAdded, onCancel }: TodoFormProps) {
         return;
       }
       
-      const newTodo = await todoService.createTodo(user.id, title, description);
-      
-      onTodoAdded(newTodo);
+      await onTodoAdded(title, description);
       setTitle('');
       setDescription('');
     } catch (err) {
@@ -69,6 +68,7 @@ export function TodoForm({ onTodoAdded, onCancel }: TodoFormProps) {
         <input
           type="text"
           id="title"
+          name="title"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           disabled={isLoading}
@@ -85,6 +85,7 @@ export function TodoForm({ onTodoAdded, onCancel }: TodoFormProps) {
         </label>
         <textarea
           id="description"
+          name="description"
           value={description}
           onChange={(e) => setDescription(e.target.value)}
           disabled={isLoading}

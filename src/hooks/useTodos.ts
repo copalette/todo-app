@@ -46,9 +46,26 @@ export const useTodos = (userId: string | undefined) => {
     if (!userId) return null;
     
     setError(null);
+    const tempId = crypto.randomUUID();
+
     try {
-      const newTodo = await todoService.createTodo(userId, title, description);
-      setTodos(prevTodos => [newTodo, ...prevTodos]);
+      console.log('楽観的更新前のTodos:', todos);
+
+      // 楽観的UI更新のためのTodoオブジェクト
+      const optimisticTodo: Todo = {
+        id: tempId,
+        user_id: userId,
+        title: title.trim(),
+        description: description.trim(),
+        is_completed: false,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      };
+
+      console.log('新しいTodo:', optimisticTodo);
+
+      // 楽観的UI更新
+      setTodos(prevTodos => [optimisticTodo, ...prevTodos]);
       
       // 統計情報を更新
       setStats(prev => ({
@@ -56,10 +73,26 @@ export const useTodos = (userId: string | undefined) => {
         completed: prev.completed,
         remaining: prev.remaining + 1
       }));
-      
+
+      // サーバーへの保存
+      const newTodo = await todoService.createTodo(userId, title, description);
+      console.log('サーバーレスポンス:', newTodo);
+
+      // 一時的なTodoを実際のものに置き換え
+      setTodos(prevTodos => 
+        prevTodos.map(todo => todo.id === tempId ? newTodo : todo)
+      );
+
       return newTodo;
     } catch (err) {
+      // エラー時の処理
       console.error('Todoの作成に失敗しました:', err);
+      setTodos(prevTodos => prevTodos.filter(todo => todo.id !== tempId));
+      setStats(prev => ({
+        total: prev.total - 1,
+        completed: prev.completed,
+        remaining: prev.remaining - 1
+      }));
       setError(err instanceof Error ? err.message : '不明なエラーが発生しました');
       return null;
     }
