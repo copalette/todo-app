@@ -59,6 +59,7 @@
   --success-color: #38a169;
   --border-radius: 8px;
   --box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  color-scheme: light;
 }
 
 body {
@@ -152,6 +153,7 @@ body {
   border-radius: var(--border-radius);
   font-size: 16px;
   transition: border-color 0.2s;
+  color-scheme: light;
 }
 
 .form-group input:focus,
@@ -170,6 +172,7 @@ body {
   font-size: 16px;
   font-weight: 500;
   transition: background-color 0.2s;
+  color-scheme: light;
 }
 
 .submit-button:hover {
@@ -443,4 +446,11 @@ body {
 
 .auth-link:hover {
   text-decoration: underline;
+}
+
+/* フォーム要素のカラースキームを強制的にライトモードに設定 */
+input,
+textarea,
+select {
+  color-scheme: light;
 }
