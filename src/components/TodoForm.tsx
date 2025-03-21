@@ -11,6 +11,7 @@ export function TodoForm({ onTodoAdded, onCancel }: TodoFormProps) {
   const [description, setDescription] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { user } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -24,8 +25,6 @@ export function TodoForm({ onTodoAdded, onCancel }: TodoFormProps) {
       console.log('Todo作成開始:', { title, description });
       setIsLoading(true);
       setError(null);
-      
-      const user = await authService.getCurrentUser();
       
       if (!user) {
         setError('ログインが必要です');

@@ -6,16 +6,17 @@ import { AuthProvider } from './contexts/AuthContext'
 function App() {
 
   return (
-  <Router>
-    <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/login" element={<LoginPage/>}/>
-        <Route path="/register" element={<RegisterPage/>}/>
-        <Route path="/todo" element={<TodoListPage />} />
-        <Route path="/todo/:id/edit" element={<TodoEditPage/>}/>
-    </Routes>
-  </Router>
-  
+    <AuthProvider>
+      <Router>
+        <Routes>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/login" element={<LoginPage/>}/>
+            <Route path="/register" element={<RegisterPage/>}/>
+            <Route path="/todo" element={<TodoListPage />} />
+            <Route path="/todo/:id/edit" element={<TodoEditPage/>}/>
+        </Routes>
+      </Router>
+    </AuthProvider>
   )
 }
 
