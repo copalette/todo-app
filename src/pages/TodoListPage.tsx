@@ -1,8 +1,7 @@
 import { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { TodoList } from '../components/TodoList';
 import { TodoForm } from '../components/TodoForm';
-import { Todo } from '../types';
 import { useAuth } from '../hooks/useAuth';
 import { useTodos } from '../hooks/useTodos';
 
