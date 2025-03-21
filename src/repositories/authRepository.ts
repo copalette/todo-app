@@ -51,7 +51,7 @@ export const authRepository = {
 
   // ユーザーの認証状態を監視
   onAuthStateChange(callback: (user: User | null) => void) {
-    const { data } = supabase.auth.onAuthStateChange((event, session) => {
+    const { data } = supabase.auth.onAuthStateChange((_event, session) => {
       callback(mapToAppUser(session?.user || null));
     });
     
