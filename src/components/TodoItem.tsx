@@ -61,11 +61,6 @@ export function TodoItem({ todo, onDelete, onToggleComplete }: TodoItemProps) {
         }`}>
           <h3 className="text-lg font-medium mb-1">{todo.title}</h3>
           <p className="text-sm text-gray-600">{todo.description}</p>
-          {todo.is_completed && (
-            <span className="inline-block mt-2 text-xs text-green-600 bg-green-50 px-2 py-1 rounded">
-              完了済み
-            </span>
-          )}
         </div>
       </div>
       <div className="flex gap-2">

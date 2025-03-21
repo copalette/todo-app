@@ -38,8 +38,7 @@ export function TodoList() {
   return (
     <div>
       <div className="mb-4 p-4 bg-white rounded-lg shadow-md">
-        <h3 className="text-lg font-medium mb-2">統計情報</h3>
-        <div className="flex gap-4">
+          <div className="flex gap-4">
           <div className="bg-gray-100 p-2 rounded-md">
             <span className="text-gray-600">合計: </span>
             <span className="font-bold">{stats.total}</span>
