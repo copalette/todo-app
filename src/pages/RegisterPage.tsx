@@ -8,6 +8,7 @@ function RegisterPage() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const { signUp, user, loading, error: authError } = useAuth();
   const [error, setError] = useState<string | null>(null);
+  const [isRegistered, setIsRegistered] = useState(false);
   const navigate = useNavigate();
 
   // ユーザーが既にログインしている場合はTodoページにリダイレクト
@@ -35,7 +36,7 @@ function RegisterPage() {
       
       const result = await signUp(email, password);
       if (result) {
-        navigate('/todo'); // 登録成功後、TodoListPageに遷移
+        setIsRegistered(true);
       }
     } catch (err) {
       console.error('アカウント登録に失敗しました:', err);
@@ -49,6 +50,30 @@ function RegisterPage() {
       setError(authError);
     }
   }, [authError]);
+
+  if (isRegistered) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
+        <div className="max-w-md w-full space-y-8 bg-white p-8 rounded-lg shadow-md">
+          <div>
+            <h2 className="text-center text-2xl font-bold text-primary">メールを送信しました</h2>
+            <p className="mt-4 text-center text-gray-600">
+              {email} 宛に確認メールを送信しました。<br />
+              メール内のリンクをクリックして、登録を完了してください。
+            </p>
+          </div>
+          <div className="mt-6">
+            <button
+              onClick={() => navigate('/login')}
+              className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
+            >
+              ログインページへ
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (loading) {
     return <div className="flex justify-center items-center min-h-screen bg-gray-50 p-4">
