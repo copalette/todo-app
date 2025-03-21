@@ -68,7 +68,7 @@ function TodoListPage() {
       <header className="flex justify-between items-center mb-8 pb-4 border-b border-gray-200">
         <h1 className="text-2xl font-bold text-primary">Todoリスト</h1>
         <div className="flex items-center gap-4">
-          <span className="text-gray-600">
+          <span className="text-gray-600 text-sm">
             {user.email}
           </span>
           <button 
