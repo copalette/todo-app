@@ -81,16 +81,7 @@ function TodoListPage() {
       </header>
 
       <main className="flex flex-col gap-6">
-        <TodoList 
-          todos={todos}
-          loading={todosLoading}
-          error={todosError}
-          stats={stats}
-          onDelete={handleDelete}
-          onToggleComplete={handleToggleComplete}
-        />
-        
-        {showAddForm ? (
+      {showAddForm ? (
           <TodoForm 
             onTodoAdded={handleTodoAdded}
             onCancel={() => setShowAddForm(false)}
@@ -103,6 +94,16 @@ function TodoListPage() {
             + 新しいTodoを追加
           </button>
         )}
+        <TodoList 
+          todos={todos}
+          loading={todosLoading}
+          error={todosError}
+          stats={stats}
+          onDelete={handleDelete}
+          onToggleComplete={handleToggleComplete}
+        />
+        
+
       </main>
     </div>
   );
