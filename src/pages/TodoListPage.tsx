@@ -70,15 +70,15 @@ function TodoListPage() {
 
   return (
     <div className="max-w-4xl mx-auto p-4 bg-gray-50 min-h-screen">
-      <header className="flex justify-between items-center mb-8 pb-4 border-b border-gray-200">
+      <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8 pb-4 border-b border-gray-200">
         <h1 className="text-2xl font-bold text-primary">Todoリスト</h1>
-        <div className="flex items-center gap-4">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4 w-full sm:w-auto">
           <span className="text-gray-600 text-sm">
             {user.email}
           </span>
           <button 
             onClick={handleLogout} 
-            className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-100 transition-colors duration-200"
+            className="w-full sm:w-auto px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-100 transition-colors duration-200"
           >
             ログアウト
           </button>
@@ -86,7 +86,7 @@ function TodoListPage() {
       </header>
 
       <main className="flex flex-col gap-6">
-      {showAddForm ? (
+        {showAddForm ? (
           <TodoForm 
             onTodoAdded={handleTodoAdded}
             onCancel={() => setShowAddForm(false)}
@@ -94,7 +94,7 @@ function TodoListPage() {
         ) : (
           <button
             onClick={() => setShowAddForm(true)}
-            className="bg-primary text-white font-medium py-2 px-4 rounded-md hover:bg-primary-dark transition duration-200 ease-in-out"
+            className="w-full sm:w-auto bg-primary text-white font-medium py-2 px-4 rounded-md hover:bg-primary-dark transition duration-200 ease-in-out"
           >
             + 新しいTodoを追加
           </button>
@@ -108,8 +108,6 @@ function TodoListPage() {
           onToggleComplete={handleToggleComplete}
           onUpdate={handleUpdate}
         />
-        
-
       </main>
     </div>
   );
