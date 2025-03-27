@@ -1,7 +1,5 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
 import { Todo } from '../types';
-import { todoService } from '../services/todoService';
 
 interface TodoItemProps {
   todo: Todo;
