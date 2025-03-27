@@ -5,19 +5,21 @@ import { todoService } from '../services/todoService';
 
 interface TodoItemProps {
   todo: Todo;
-  onDelete: (id: string) => void;
-  onToggleComplete: (id: string) => void;
+  onDelete: (id: string) => Promise<void>;
+  onToggleComplete: (id: string) => Promise<void>;
+  onUpdate: (id: string, title: string, description: string) => Promise<void>;
 }
 
-export function TodoItem({ todo, onDelete, onToggleComplete }: TodoItemProps) {
+export function TodoItem({ todo, onDelete, onToggleComplete, onUpdate }: TodoItemProps) {
+  const [isEditing, setIsEditing] = useState(false);
+  const [title, setTitle] = useState(todo.title);
+  const [description, setDescription] = useState(todo.description || '');
   const [isLoading, setIsLoading] = useState(false);
 
   const handleToggleComplete = async () => {
+    setIsLoading(true);
     try {
-      setIsLoading(true);
-      onToggleComplete(todo.id);
-    } catch (error) {
-      console.error('Todoの完了状態の更新に失敗しました:', error);
+      await onToggleComplete(todo.id);
     } finally {
       setIsLoading(false);
     }
@@ -27,8 +29,7 @@ export function TodoItem({ todo, onDelete, onToggleComplete }: TodoItemProps) {
     if (window.confirm('このTodoを削除してもよろしいですか？')) {
       try {
         setIsLoading(true);
-        await todoService.deleteTodo(todo.id);
-        onDelete(todo.id);
+        await onDelete(todo.id);
       } catch (error) {
         console.error('Todoの削除に失敗しました:', error);
       } finally {
@@ -36,6 +37,56 @@ export function TodoItem({ todo, onDelete, onToggleComplete }: TodoItemProps) {
       }
     }
   };
+
+  const handleUpdate = async () => {
+    if (!title.trim()) return;
+    
+    setIsLoading(true);
+    try {
+      await onUpdate(todo.id, title, description);
+      setIsEditing(false);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  if (isEditing) {
+    return (
+      <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+        <div className="space-y-4">
+          <input
+            type="text"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+            placeholder="タイトル"
+          />
+          <textarea
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+            placeholder="説明"
+            rows={3}
+          />
+          <div className="flex justify-end gap-2">
+            <button
+              onClick={() => setIsEditing(false)}
+              className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-md transition-colors duration-200"
+            >
+              キャンセル
+            </button>
+            <button
+              onClick={handleUpdate}
+              disabled={isLoading || !title.trim()}
+              className="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary-dark transition-colors duration-200 disabled:opacity-50"
+            >
+              保存
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className={`bg-white p-5 rounded-lg shadow-md flex justify-between items-center hover:shadow-lg transition-all duration-200 ${
@@ -64,12 +115,12 @@ export function TodoItem({ todo, onDelete, onToggleComplete }: TodoItemProps) {
         </div>
       </div>
       <div className="flex gap-2">
-        <Link 
-          to={`/todo/${todo.id}/edit`} 
+        <button 
+          onClick={() => setIsEditing(true)}
           className="bg-gray-200 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-300 transition-colors duration-200"
         >
           編集
-        </Link>
+        </button>
         <button 
           onClick={handleDelete} 
           disabled={isLoading}

@@ -12,6 +12,7 @@ interface TodoListProps {
   };
   onDelete: (id: string) => Promise<void>;
   onToggleComplete: (id: string) => Promise<void>;
+  onUpdate: (id: string, title: string, description: string) => Promise<void>;
 }
 
 export function TodoList({ 
@@ -20,7 +21,8 @@ export function TodoList({
   error, 
   stats,
   onDelete,
-  onToggleComplete 
+  onToggleComplete,
+  onUpdate
 }: TodoListProps) {
   if (loading) {
     return <div className="p-8 text-center text-gray-600 bg-white rounded-lg shadow-md">読み込み中...</div>;
@@ -60,6 +62,7 @@ export function TodoList({
             todo={todo} 
             onDelete={onDelete}
             onToggleComplete={onToggleComplete}
+            onUpdate={onUpdate}
           />
         ))}
       </div>

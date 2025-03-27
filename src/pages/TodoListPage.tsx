@@ -15,7 +15,8 @@ function TodoListPage() {
     stats,
     createTodo,
     deleteTodo,
-    toggleTodoCompletion
+    toggleTodoCompletion,
+    updateTodo
   } = useTodos(user?.id);
 
   // 認証状態が変わったときにリダイレクト
@@ -40,6 +41,10 @@ function TodoListPage() {
 
   const handleToggleComplete = async (id: string) => {
     await toggleTodoCompletion(id);
+  };
+
+  const handleUpdate = async (id: string, title: string, description: string) => {
+    await updateTodo(id, { title, description });
   };
 
   const handleLogout = async () => {
@@ -101,6 +106,7 @@ function TodoListPage() {
           stats={stats}
           onDelete={handleDelete}
           onToggleComplete={handleToggleComplete}
+          onUpdate={handleUpdate}
         />
         
 
